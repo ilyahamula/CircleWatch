@@ -4,6 +4,22 @@
 #include "RTClib.h"
 #include "CircleDial.h"
 
+#define LIGHT_SENSOR_PIN_D 26
+#define LIGHT_SENSOR_PIN_A 25
+
+namespace
+{
+    void adjustBrightness(uint16_t light, CircleDial& dial)
+    {
+        if (light <= 1000)
+            dial.SetBrightness(255);
+        else if (light >= 3700)
+            dial.SetBrightness(20);
+        else
+            dial.SetBrightness(static_cast<uint8_t>(map(100000 / light, 27, 100, 25, 250)));
+    }
+}
+
 RTC_DS1307 rtc;
 CircleDial* dial = nullptr;
 
@@ -31,12 +47,18 @@ void setup()
     }
 
     // following line sets the RTC to the date &amp; time this sketch was compiled
-    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+    //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 }
 
 void loop()
 {
     DateTime now = rtc.now();
+
+    int analogValue = analogRead(LIGHT_SENSOR_PIN_A);
+    adjustBrightness(analogValue, *dial);
+    // We'll have a few threshholds, qualitatively determined
+    
+
     Serial.print(now.year(), DEC);
     Serial.print('/');
     Serial.print(now.month(), DEC);
@@ -49,6 +71,10 @@ void loop()
     Serial.print(':');
     Serial.print(now.second(), DEC);
     Serial.println();
+    Serial.println();
+    Serial.println();
+  
     dial->SetTime(now.hour(), now.minute());
-    delay(1000);
+    delay(200);
+    //delay(1000);
 }
