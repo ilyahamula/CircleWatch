@@ -1,20 +1,10 @@
-#ifndef CIRCLEDIAL_H
-#define CIRCLEDIAL_H
+#pragma once
 
-#include <Arduino.h>
-
-#define MINUTES 60
-#define HOURS 12
+#include "Defines.h"
+#include "sRGB.h"
 
 class Adafruit_NeoPixel;
 class Digit;
-
-struct sRGB
-{
-    uint8_t red = 0;
-    uint8_t green = 0;
-    uint8_t blue = 0;
-};
 
 class CircleDial
 {
@@ -23,9 +13,9 @@ public:
     ~CircleDial();
     bool SetTime(uint8_t hour, uint8_t min);
     void SetBrightness(uint8_t value);
-    void SetHoursColor(sRGB value);
-    void SetMinutesColor(sRGB value);
-    void Off();
+    void SetHoursColor(const sRGB& value);
+    void SetMinutesColor(const sRGB& value);
+    void Show();
 
 private:
     Adafruit_NeoPixel* m_strip;
@@ -39,5 +29,3 @@ private:
     sRGB m_hourColor;
     sRGB m_minuteColor;
 };
-
-#endif

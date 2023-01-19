@@ -3,11 +3,8 @@
 
 #include <Adafruit_NeoPixel.h>
 
-#define LED_COUNT 111
-#define DEFAULT_BRIGHTNESS 100
-
 CircleDial::CircleDial(uint8_t pin)
-    : m_strip(new Adafruit_NeoPixel(LED_COUNT, pin, NEO_GRB + NEO_KHZ800))
+    : m_strip(new Adafruit_NeoPixel(DIAL_LED_COUNT, pin, NEO_GRB + NEO_KHZ800))
     , m_currHourDigit(nullptr)
     , m_currMinDigit(nullptr)
 {
@@ -144,22 +141,25 @@ bool CircleDial::SetTime(uint8_t hour, uint8_t min)
     else
         m_currMinDigit->TurnOff();
 
-    m_strip->show();
     return true;
 }
 
 void CircleDial::SetBrightness(uint8_t value)
 {
     m_strip->setBrightness(value);
-    m_strip->show();
 }
 
-void CircleDial::SetHoursColor(sRGB value)
+void CircleDial::SetHoursColor(const sRGB& value)
 {
     m_hourColor = value;
 }
 
-void CircleDial::SetMinutesColor(sRGB value)
+void CircleDial::SetMinutesColor(const sRGB& value)
 {
     m_minuteColor = value;
+}
+
+void CircleDial::Show()
+{
+    m_strip->show();
 }
