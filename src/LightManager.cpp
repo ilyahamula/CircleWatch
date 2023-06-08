@@ -138,9 +138,10 @@ namespace
 
 void RunLightManager(void* params)
 {
-    while (true)
+    auto strip = reinterpret_cast<Adafruit_NeoPixel*>(params);
+    if (strip)
     {
-        LightManager::Instance().Run();
+        runRainbowWheel(*strip);
     }
 }
 
@@ -150,30 +151,17 @@ void LightManager::Test(uint8_t pin, uint8_t ledNum)
     runRainbowWheel(*strip);
 }
 
-void LightManager::Init()
-{
-    xTaskCreatePinnedToCore(
-        RunLightManager,   /* Task function. */
-        "light manager",     /* name of task. */
-        10000,       /* Stack size of task */
-        NULL,        /* parameter of the task */
-        1,           /* priority of the task */
-        &LightManager::Instance().m_lightTask,      /* Task handle to keep track of created task */
-        1);          /* pin task to core 0 */ 
-}
-
-LightManager& LightManager::Instance()
-{
-    static LightManager inst(LIGHT_PIN);
-    return inst;
-}
-
 LightManager::LightManager(uint8_t pin)
     : m_strip(createStrip(pin, LIGHT_LED_COUNT))
     , m_outerColor(255, 255, 255)
     , m_innerColor(255, 255, 255)
     , m_mode(eLightMode::Off)
+    , m_lightTask(nullptr)
+    , m_update(true)
 {
+    m_strip->begin();
+    m_strip->setBrightness(DEFAULT_BRIGHTNESS);
+    m_strip->show(); // Initialize all pixels to 'off'
 }
 
 LightManager::~LightManager()
@@ -183,6 +171,8 @@ LightManager::~LightManager()
 
 void LightManager::SetBrightness(uint8_t value)
 {
+    if (m_mode == eLightMode::RainbowWheel || m_mode == eLightMode::Off)
+        return;
     m_brightness = value;
     m_strip->setBrightness(value);
 }
@@ -200,25 +190,62 @@ void LightManager::SetInnerColor(const sRGB& color)
 void LightManager::SetMode(const eLightMode mode)
 {
     m_mode = mode;
+    SetUpdate(true);
+}
+
+void LightManager::SetUpdate(const bool update)
+{
+    m_update = update;
 }
 
 void LightManager::Run()
 {
+    if (!m_update)
+        return;
+    m_update = false;
+
     switch (m_mode)
     {
-    case eLightMode::Normal:
+    case eLightMode::WhiteCold:
+    {
+        KillTaskIfExist();
+        SetInnerColor({255, 255, 255});
+        SetOuterColor({255, 255, 255});
         RunNormalMode();
         break;
+    }
+    case eLightMode::WhiteWarm:
+    {
+        KillTaskIfExist();
+        SetInnerColor({255, 160, 140});
+        SetOuterColor({255, 160, 140});
+        RunNormalMode();
+        break;
+    }
+    case eLightMode::Custom:
+    {
+        KillTaskIfExist();
+        RunNormalMode();
+        break;
+    }
     case eLightMode::SmoothTransfusion:
+    {
+        KillTaskIfExist();
         RunSmoothTransfusionMode();
         break;
+    }
     case eLightMode::RainbowWheel:
+    {
         RunRainbowWheelMode();
         break;
+    }
     case eLightMode::Off:
     default:
+    {
+        KillTaskIfExist();
         Off();
         break;
+    }
     }
 }
 
@@ -242,11 +269,28 @@ void LightManager::RunSmoothTransfusionMode()
 
 void LightManager::RunRainbowWheelMode()
 {
-    runRainbowWheel(*m_strip);
+    xTaskCreatePinnedToCore(
+        RunLightManager,   /* Task function. */
+        "light manager",     /* name of task. */
+        10000,       /* Stack size of task */
+        m_strip,        /* parameter of the task */
+        1,           /* priority of the task */
+        &m_lightTask,      /* Task handle to keep track of created task */
+        1);          /* pin task to core 0 */ 
 }
 
 void LightManager::Off()
 {
     m_strip->clear();
     m_strip->show();
+}
+
+void LightManager::KillTaskIfExist()
+{
+    if (m_lightTask)
+    {
+        vTaskSuspend(m_lightTask);
+        vTaskDelete(m_lightTask);
+        m_lightTask = nullptr;
+    }
 }
