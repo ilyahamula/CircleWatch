@@ -51,7 +51,7 @@ void setup()
     delay(500);
 #ifdef DEBUG
     Serial.begin(9600);
-    delay(1000); // wait for console opening
+    delay(1000);
     Serial.println("conecting to RTC...");
 #endif
     while (!rtc.begin())
@@ -63,7 +63,6 @@ void setup()
 #endif
 
     light = new LightManager(LIGHT_PIN);
-    //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 }
 
 void loop()
@@ -71,11 +70,11 @@ void loop()
     DateTime now = rtc.now();
 
     const auto cmd = Command::InitOrInst().GetCommand();
-/*
+
 #ifdef DEBUG
     Serial.println(Command::CmdToString(cmd));
 #endif
-*/
+
     switch (cmd)
     {
     case eCommand::AddHour:
@@ -149,7 +148,7 @@ void loop()
     dial->Show();
     
     light->Run();
-/*
+
 #ifdef DEBUG
     Serial.print("Sensor = ");
     Serial.println(analogRead(LIGHT_SENSOR_PIN));
@@ -158,5 +157,5 @@ void loop()
     printTimeInSerial(now);
     delay(1000);
 #endif
-*/
+
 }

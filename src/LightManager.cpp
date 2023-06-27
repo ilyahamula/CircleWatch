@@ -136,7 +136,7 @@ namespace
     }
 }
 
-void RunLightManager(void* params)
+void RunRainbowTask(void* params)
 {
     auto strip = reinterpret_cast<Adafruit_NeoPixel*>(params);
     if (strip)
@@ -270,7 +270,7 @@ void LightManager::RunSmoothTransfusionMode()
 void LightManager::RunRainbowWheelMode()
 {
     xTaskCreatePinnedToCore(
-        RunLightManager,   /* Task function. */
+        RunRainbowTask,   /* Task function. */
         "light manager",     /* name of task. */
         10000,       /* Stack size of task */
         m_strip,        /* parameter of the task */

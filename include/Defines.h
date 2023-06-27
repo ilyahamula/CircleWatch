@@ -2,7 +2,7 @@
 
 #include <pins_arduino.h>
 
-#define DEBUG
+//#define DEBUG
 
 #define SERVICE_UUID "8a1b5b74-15a8-44f2-9175-01fd0c08702d" // ID service
 #define ELEM_UUID "42e2c66a-bff1-409e-9b99-1c7c5ad05970" // ID characteristic
@@ -58,6 +58,7 @@
 #define TOP_SENSOR_VALUE 3500
 
 #define NOT_DEFINED_TIME -1
+#define ADJUST_TIME_MACRO  rtc.adjust(DateTime(F(__DATE__), F(__TIME__)))
 
 // colors
 #define HOUR_COLOR {255, 255, 255}
