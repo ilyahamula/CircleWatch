@@ -7,6 +7,7 @@
 #include "LightManager.h"
 #include "Command.h"
 #include "BluetoothUtils.h"
+#include "DeepSleepManager.h"
 
 namespace
 {
@@ -45,7 +46,10 @@ LightManager* light = nullptr;
 
 void setup()
 {
+    pinMode(MOSFET_PIN, OUTPUT);
+    digitalWrite(MOSFET_PIN, HIGH);
     pinMode(LIGHT_SENSOR_PIN, INPUT);
+
     dial = new CircleDial(DIAL_PIN);
     InitBluetooth(); 
     delay(500);
@@ -58,6 +62,7 @@ void setup()
     {
         delay(200);
     }
+    //ADJUST_TIME_MACRO(rtc);
 #ifdef DEBUG
     Serial.println("RTC connected!");
 #endif
@@ -67,8 +72,9 @@ void setup()
 
 void loop()
 {
+    DeepSleepManager::inst().check(dial);
+    
     DateTime now = rtc.now();
-
     const auto cmd = Command::InitOrInst().GetCommand();
 
 #ifdef DEBUG
@@ -136,6 +142,11 @@ void loop()
     {
         dial->SetHoursColor(HOUR_COLOR);
         dial->SetMinutesColor(MIN_COLOR);
+        break;
+    }
+    case eCommand::TimeBeforeDeepSleep:
+    {
+        DeepSleepManager::inst().m_activeTime = Command::InitOrInst().GetIntValue();
         break;
     }
     case eCommand::None:

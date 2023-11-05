@@ -24,6 +24,7 @@ public:
     void SetMinutesColor(const sRGB& value);
     void SetMode(eDialMode mode);
     void Show();
+    void TurnOff();
 
 private:
     void SetDigitHourTime(uint8_t hour, uint8_t min);

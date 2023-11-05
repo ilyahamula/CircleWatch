@@ -8,31 +8,38 @@
 #include <BLE2902.h>
 
 #include "Command.h"
+#include "DeepSleepManager.h"
 
 #define DEVINFO_UUID              (uint16_t)0x180a
 #define DEVINFO_MANUFACTURER_UUID (uint16_t)0x2a29
 #define DEVINFO_NAME_UUID         (uint16_t)0x2a24
 #define DEVINFO_SERIAL_UUID       (uint16_t)0x2a25
 
-#ifdef DEBUG
 class ServerCallbacks: public BLEServerCallbacks 
 {
     void onConnect(BLEServer* pServer) 
     {
+        DeepSleepManager::inst().m_isUserBLEConnected = true;
+        #ifdef DEBUG
         Serial.println("BLE connected device");
+        #endif
     };
 
     void onDisconnect(BLEServer* pServer)
     {
+        DeepSleepManager::inst().m_isUserBLEConnected = false;
+        #ifdef DEBUG
         Serial.println("Device BLE disconnected");
+        #endif
     }
 public:
+    #ifdef DEBUG
     ~ServerCallbacks()
     {
         Serial.println("Server Callback object is destroyed!!!");
     }
+    #endif
 };
-#endif
 
 class BLECommandReader : public BLECharacteristicCallbacks 
 {
@@ -88,14 +95,14 @@ void RunBLE(void* params)
 
 void InitBluetooth()
 {
-    TaskHandle_t task;
+    static TaskHandle_t task;
     xTaskCreatePinnedToCore(
         RunBLE,   
         "command tracker",     
         10000,       
         NULL,        
-        0,   
+        tskIDLE_PRIORITY,   
         &task,      
-        1);    
+        tskNO_AFFINITY);    
 }
 

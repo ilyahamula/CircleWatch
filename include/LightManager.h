@@ -24,7 +24,7 @@ public:
     ~LightManager();
 
 public:
-    static void Test(uint8_t pin = DIAL_PIN, uint8_t ledNum = DIAL_LED_COUNT);
+    static void Test(uint8_t pin = DIAL_PIN, uint16_t ledNum = DIAL_LED_COUNT);
 
 public:
     void SetBrightness(uint8_t value);
@@ -33,6 +33,7 @@ public:
     void SetMode(const eLightMode mode);
     void SetUpdate(const bool update);
     void Run();
+    void TurnOff();
 
 private:
     void RunNormalMode();

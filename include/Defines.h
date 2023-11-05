@@ -26,6 +26,7 @@
 #define DIAL_DIGIT_HOUR "/dial_digit_hour"
 #define DIAL_SEGMENT_HOUR "/dial_segment_hour"
 #define DIAL_DEFAULT_COLORS "/dial_default_colors"
+#define SET_DEEP_SLEEP_TIME "/set_deep_sleep_time"
 
 #define CMD_PARAM_SEPARATOR ' '
 #define COLOR_VALUE_SEPARATOR ','
@@ -48,7 +49,7 @@
 #define MINUTES 60
 #define HOURS 12
 
-#define LIGHT_LED_COUNT 60
+#define LIGHT_LED_COUNT 309
 #define DIAL_LED_COUNT 111
 
 #define DEFAULT_BRIGHTNESS 50
@@ -58,11 +59,16 @@
 #define TOP_SENSOR_VALUE 3500
 
 #define NOT_DEFINED_TIME -1
-#define ADJUST_TIME_MACRO  rtc.adjust(DateTime(F(__DATE__), F(__TIME__)))
+#define ADJUST_TIME_MACRO(obj)  obj.adjust(DateTime(F(__DATE__), F(__TIME__)))
 
 // colors
 #define HOUR_COLOR {255, 255, 255}
 #define MIN_COLOR {0, 0, 255}
+
+// deep sleep
+#define WAKEUP_PIN D1
+#define WORKING_TIME 100000 // 1 min
+#define MOSFET_PIN D7
 
 using uint8_t = unsigned char;
 using TaskHandle_t = void*;

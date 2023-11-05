@@ -154,7 +154,7 @@ void Command::ParseCommand(const String& text)
     String cmd, params;
     StringUtils::ParseCmdAndParams(text, cmd, params);
 
-    // lsmbdas ------------------------------------------------------------
+    // lambdas ------------------------------------------------------------
     auto parseTimeCmd = [this, &params](const eCommand cmd)
     {
         if (!StringUtils::ParseTime(params, m_hours, m_min))
@@ -185,7 +185,8 @@ void Command::ParseCommand(const String& text)
             Serial.println("Failed to parse int value!!!");
             #endif
         }
-        m_currCmd = cmd;
+        else
+            m_currCmd = cmd;
     };
     // end lambdas --------------------------------------------------------
     
@@ -222,6 +223,8 @@ void Command::ParseCommand(const String& text)
         m_currCmd = eCommand::DialSegmentHour;
     else if (cmd == DIAL_DEFAULT_COLORS)
         m_currCmd = eCommand::DialDefaultColors;
+    else if (cmd == SET_DEEP_SLEEP_TIME)
+        parseIntValueCmd(eCommand::TimeBeforeDeepSleep);
 }
 
 int Command::GetIntValue() const

@@ -1,6 +1,6 @@
 #include "LightManager.h"
 #include "Command.h"
-
+#include "DeepSleepManager.h"
 #include <Adafruit_NeoPixel.h>
 
 namespace
@@ -110,6 +110,7 @@ namespace
 
     void runRainbowWheel(Adafruit_NeoPixel& strip)
     {
+        /*
         // Some example procedures showing how to display to the pixels:
         colorWipe(strip.Color(255, 0, 0), 50, strip); // Red
         colorWipe(strip.Color(0, 255, 0), 50, strip); // Green
@@ -122,11 +123,13 @@ namespace
         theaterChase(strip.Color(0, 0, 127), 50, strip); // Blue
 
         rainbow(20, strip);
+      
         rainbowCycle(20, strip);
         theaterChaseRainbow(50, strip);
+        */
     }
 
-    Adafruit_NeoPixel* createStrip(uint8_t pin, uint8_t ledNum)
+    Adafruit_NeoPixel* createStrip(uint8_t pin, uint16_t ledNum)
     {
         Adafruit_NeoPixel* strip = new Adafruit_NeoPixel(ledNum, pin, NEO_GRB + NEO_KHZ800);
         strip->begin();
@@ -141,11 +144,15 @@ void RunRainbowTask(void* params)
     auto strip = reinterpret_cast<Adafruit_NeoPixel*>(params);
     if (strip)
     {
-        runRainbowWheel(*strip);
+        //runRainbowWheel(*strip);
+        while(true)
+        {
+            rainbow(20, *strip);
+        }
     }
 }
 
-void LightManager::Test(uint8_t pin, uint8_t ledNum)
+void LightManager::Test(uint8_t pin, uint16_t ledNum)
 {
     static Adafruit_NeoPixel* strip = createStrip(pin, ledNum);
     runRainbowWheel(*strip);
@@ -236,6 +243,7 @@ void LightManager::Run()
     }
     case eLightMode::RainbowWheel:
     {
+        KillTaskIfExist();
         RunRainbowWheelMode();
         break;
     }
@@ -247,15 +255,17 @@ void LightManager::Run()
         break;
     }
     }
+
+    DeepSleepManager::inst().m_isLighthOn = m_mode != eLightMode::Off;
 }
 
 void LightManager::RunNormalMode()
 {
-    for(uint8_t i = 0; i <= LIGHT_OUTER_END_IDX; i++)
+    for(uint16_t i = 0; i <= LIGHT_OUTER_END_IDX; i++)
     {
         m_strip->setPixelColor(i, m_outerColor.red, m_outerColor.green, m_outerColor.blue);
     }
-    for(uint8_t i = LIGHT_OUTER_END_IDX + 1; i < m_strip->numPixels(); i++)
+    for(uint16_t i = LIGHT_OUTER_END_IDX + 1; i < m_strip->numPixels(); i++)
     {
         m_strip->setPixelColor(i, m_innerColor.red, m_innerColor.green, m_innerColor.blue);
     }
@@ -272,11 +282,11 @@ void LightManager::RunRainbowWheelMode()
     xTaskCreatePinnedToCore(
         RunRainbowTask,   /* Task function. */
         "light manager",     /* name of task. */
-        10000,       /* Stack size of task */
+        1000,       /* Stack size of task */
         m_strip,        /* parameter of the task */
-        1,           /* priority of the task */
+        tskIDLE_PRIORITY,           /* priority of the task */
         &m_lightTask,      /* Task handle to keep track of created task */
-        1);          /* pin task to core 0 */ 
+        tskNO_AFFINITY);          /* pin task to core 0 */ 
 }
 
 void LightManager::Off()
@@ -293,4 +303,11 @@ void LightManager::KillTaskIfExist()
         vTaskDelete(m_lightTask);
         m_lightTask = nullptr;
     }
+}
+
+void LightManager::TurnOff()
+{
+    KillTaskIfExist();
+    Off();
+    m_mode = eLightMode::Off;
 }

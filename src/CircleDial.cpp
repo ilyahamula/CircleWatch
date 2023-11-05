@@ -310,3 +310,9 @@ void CircleDial::OffCurrent()
         m_currHourDigit = nullptr;
     }
 }
+
+void CircleDial::TurnOff()
+{
+    m_strip->clear();
+    m_strip->show();
+}

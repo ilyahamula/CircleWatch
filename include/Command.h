@@ -22,6 +22,7 @@ enum class eCommand
     DialDigitHour,
     DialSegmentHour,
     DialDefaultColors,
+    TimeBeforeDeepSleep,
 };
 
 class Command
