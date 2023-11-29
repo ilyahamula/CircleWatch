@@ -54,7 +54,8 @@ void DeepSleepManager::check(CircleDial* dial)
     {
         if (dial)
             dial->TurnOff();
-        digitalWrite(MOSFET_PIN, LOW);
+        digitalWrite(MOSFET_DIAL_PIN, LOW);
+        digitalWrite(MOSFET_LIGHT_PIN, LOW);
         esp_deep_sleep_start();
     }
 }

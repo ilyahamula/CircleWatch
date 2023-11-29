@@ -46,12 +46,9 @@ LightManager* light = nullptr;
 
 void setup()
 {
-    pinMode(MOSFET_PIN, OUTPUT);
-    digitalWrite(MOSFET_PIN, HIGH);
     pinMode(LIGHT_SENSOR_PIN, INPUT);
 
     dial = new CircleDial(DIAL_PIN);
-    InitBluetooth(); 
     delay(500);
 #ifdef DEBUG
     Serial.begin(9600);
@@ -72,6 +69,11 @@ void setup()
 
 void loop()
 {
+    if (digitalRead(BLE_SWITCH))
+        BluetoothLE::Init();
+    else 
+        BluetoothLE::Deinit();
+
     DeepSleepManager::inst().check(dial);
     
     DateTime now = rtc.now();

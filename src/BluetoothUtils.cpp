@@ -93,16 +93,29 @@ void RunBLE(void* params)
         vTaskDelay(10);
 }
 
-void InitBluetooth()
+TaskHandle_t BluetoothLE::task = nullptr;
+
+void BluetoothLE::Init()
 {
-    static TaskHandle_t task;
-    xTaskCreatePinnedToCore(
-        RunBLE,   
-        "command tracker",     
-        10000,       
-        NULL,        
-        tskIDLE_PRIORITY,   
-        &task,      
-        tskNO_AFFINITY);    
+    if (!task)
+    {
+        xTaskCreatePinnedToCore(
+            RunBLE,   
+            "command tracker",     
+            10000,       
+            NULL,        
+            tskIDLE_PRIORITY,   
+            &task,      
+            tskNO_AFFINITY);
+    }
 }
 
+void BluetoothLE::Deinit()
+{
+    if (task)
+    {
+        vTaskSuspend(task);
+        vTaskDelete(task);
+        task = nullptr;
+    }
+}

@@ -18,6 +18,9 @@ CircleDial::CircleDial(uint8_t pin)
     , m_hourColor(FLASHMEM.ReadColor(eAddres::HoursColorAddr))
     , m_minuteColor(FLASHMEM.ReadColor(eAddres::MinutesColorAddr))
 {
+    pinMode(MOSFET_DIAL_PIN, OUTPUT);
+    digitalWrite(MOSFET_DIAL_PIN, HIGH);
+    
     m_strip->begin();
     m_strip->setBrightness(DEFAULT_BRIGHTNESS);
     m_strip->show(); // Initialize all pixels to 'off'

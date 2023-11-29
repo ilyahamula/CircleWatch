@@ -3,4 +3,11 @@
 #include "Defines.h"
 
 class BLECommandReader;
-void InitBluetooth();
+
+struct BluetoothLE
+{
+    static void Init();
+    static void Deinit();
+private:
+    static TaskHandle_t task;
+};

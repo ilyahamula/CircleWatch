@@ -2,7 +2,6 @@
 
 #include "Defines.h"
 #include <initializer_list>
-#define NUM_SEG_DIGITS 5
 
 class Digit;
 class sRGB;

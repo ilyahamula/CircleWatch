@@ -166,6 +166,9 @@ LightManager::LightManager(uint8_t pin)
     , m_lightTask(nullptr)
     , m_update(true)
 {
+    pinMode(MOSFET_LIGHT_PIN, OUTPUT);
+    digitalWrite(MOSFET_LIGHT_PIN, LOW);
+
     m_strip->begin();
     m_strip->setBrightness(DEFAULT_BRIGHTNESS);
     m_strip->show(); // Initialize all pixels to 'off'
@@ -211,6 +214,9 @@ void LightManager::Run()
         return;
     m_update = false;
 
+    if (m_mode != eLightMode::Off)
+        digitalWrite(MOSFET_LIGHT_PIN, HIGH);
+        
     switch (m_mode)
     {
     case eLightMode::WhiteCold:
@@ -293,6 +299,7 @@ void LightManager::Off()
 {
     m_strip->clear();
     m_strip->show();
+    digitalWrite(MOSFET_LIGHT_PIN, LOW);
 }
 
 void LightManager::KillTaskIfExist()

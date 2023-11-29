@@ -45,6 +45,7 @@
 #define DIAL_PIN D9
 #define LIGHT_PIN D10
 #define LIGHT_OUTER_END_IDX 35
+#define NUM_SEG_DIGITS 5
 
 #define MINUTES 60
 #define HOURS 12
@@ -68,7 +69,10 @@
 // deep sleep
 #define WAKEUP_PIN D1
 #define WORKING_TIME 100000 // 1 min
-#define MOSFET_PIN D7
+#define MOSFET_DIAL_PIN D7
+#define MOSFET_LIGHT_PIN D8
+
+#define BLE_SWITCH D6
 
 using uint8_t = unsigned char;
 using TaskHandle_t = void*;
