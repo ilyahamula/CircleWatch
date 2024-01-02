@@ -22,14 +22,16 @@
 #define LIGHT_WHITE_WARM "/light_white_warm_mode"
 #define LIGHT_CUSTOM "/light_custom_mode"
 #define LIGHT_BRIGHTNESS "/light_brightness"
-#define LIGHT_SMOOTHE "/light_smoothe_mode"
+#define LIGHT_SMOOTHE "/light_smoothe_mode" // deprecated
 #define DIAL_DIGIT_HOUR "/dial_digit_hour"
 #define DIAL_SEGMENT_HOUR "/dial_segment_hour"
 #define DIAL_DEFAULT_COLORS "/dial_default_colors"
 #define SET_DEEP_SLEEP_TIME "/set_deep_sleep_time"
+#define DIAL_BRIGHTNESS "/dial_brightness"
 
 #define CMD_PARAM_SEPARATOR ' '
 #define COLOR_VALUE_SEPARATOR ','
+#define TIME_SEPARATOR ':'
 
 // buttons
 //#define USE_BUTTONS

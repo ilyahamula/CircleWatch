@@ -11,6 +11,7 @@
 
 namespace
 {
+    /*
     uint8_t adjustBrightness(uint16_t light)
     {
         if (light <= LOW_SENSOR_VALUE)
@@ -21,6 +22,7 @@ namespace
         return static_cast<uint8_t>(map(light, LOW_SENSOR_VALUE, 
             TOP_SENSOR_VALUE, MIN_BRIGHTNESS, MAX_BRIGHTNESS));
     }
+    */
 #ifdef DEBUG
     void printTimeInSerial(const DateTime& now)
     {
@@ -40,13 +42,15 @@ namespace
 #endif
 }
 
-RTC_DS1307 rtc;
+//RTC_DS1307 rtc;
+RTC_DS3231 rtc;
 CircleDial* dial = nullptr;
 LightManager* light = nullptr;
 
 void setup()
 {
-    pinMode(LIGHT_SENSOR_PIN, INPUT);
+    //pinMode(LIGHT_SENSOR_PIN, INPUT);
+    //pinMode(BLE_SWITCH, INPUT_PULLDOWN);
 
     dial = new CircleDial(DIAL_PIN);
     delay(500);
@@ -65,15 +69,21 @@ void setup()
 #endif
 
     light = new LightManager(LIGHT_PIN);
+    BluetoothLE::Init();
 }
 
 void loop()
 {
+    /*
     if (digitalRead(BLE_SWITCH))
+    {
         BluetoothLE::Init();
-    else 
+    }
+    else
+    {
         BluetoothLE::Deinit();
-
+    }
+    */
     DeepSleepManager::inst().check(dial);
     
     DateTime now = rtc.now();
@@ -151,22 +161,23 @@ void loop()
         DeepSleepManager::inst().m_activeTime = Command::InitOrInst().GetIntValue();
         break;
     }
+    case eCommand::DialBrightness:
+    {
+        dial->SetBrightness(static_cast<uint8_t>(Command::InitOrInst().GetIntValue()));
+        break;
+    }
     case eCommand::None:
     default:
         break;
     }
 
     dial->SetTime(now.hour(), now.minute());
-    dial->SetBrightness(adjustBrightness(analogRead(LIGHT_SENSOR_PIN)));
+    //dial->SetBrightness(adjustBrightness(analogRead(LIGHT_SENSOR_PIN)));
     dial->Show();
     
     light->Run();
 
 #ifdef DEBUG
-    Serial.print("Sensor = ");
-    Serial.println(analogRead(LIGHT_SENSOR_PIN));
-    Serial.print("LIGHT = ");
-    Serial.println(adjustBrightness(analogRead(LIGHT_SENSOR_PIN)));
     printTimeInSerial(now);
     delay(1000);
 #endif

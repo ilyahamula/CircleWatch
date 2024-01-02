@@ -16,7 +16,7 @@ namespace StringUtils
 
     bool ParseTime(const String& text, signed char& hours, signed char& min)
     {
-        const int pos = text.indexOf(':');
+        const int pos = text.indexOf(TIME_SEPARATOR);
         if (pos == -1)
             return false;
 

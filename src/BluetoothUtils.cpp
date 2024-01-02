@@ -32,13 +32,14 @@ class ServerCallbacks: public BLEServerCallbacks
         Serial.println("Device BLE disconnected");
         #endif
     }
+#ifdef DEBUG
 public:
-    #ifdef DEBUG
+    
     ~ServerCallbacks()
     {
         Serial.println("Server Callback object is destroyed!!!");
     }
-    #endif
+#endif
 };
 
 class BLECommandReader : public BLECharacteristicCallbacks 
@@ -47,11 +48,6 @@ class BLECommandReader : public BLECharacteristicCallbacks
     {
         std::string value1 = pCharacteristic->getValue();
         Command::InitOrInst().ParseCommand(value1.c_str());
-    }
-public:
-    ~BLECommandReader()
-    {
-        Serial.println("BLECommandReader object is destroyed!!!");
     }
 };
 
@@ -99,6 +95,9 @@ void BluetoothLE::Init()
 {
     if (!task)
     {
+        #ifdef DEBUG
+        Serial.println("BLE initialized");
+        #endif
         xTaskCreatePinnedToCore(
             RunBLE,   
             "command tracker",     
@@ -114,6 +113,9 @@ void BluetoothLE::Deinit()
 {
     if (task)
     {
+        #ifdef DEBUG
+        Serial.println("BLE Deinitialized");
+        #endif
         vTaskSuspend(task);
         vTaskDelete(task);
         task = nullptr;
