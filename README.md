@@ -8,7 +8,7 @@ The watch is controlled via Bluetooth Low Energy.
 
 ## Real device images
 
-![CircleWatch pic1](images/IMG_3632.jpeg)
+![CircleWatch pic1](images/IMG_3632.jpeg) ![CircleWatch pic1](images/IMG_3630.jpeg)
 
 ## Instalation
 To build/load this project for ESP32 platform we need just to instal VS Code and [PlatformIO](https://platformio.org/) extension and clone the repo.
