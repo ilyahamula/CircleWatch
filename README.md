@@ -6,6 +6,10 @@ Concept of design was to use the minimalistic thin dial with rgb led highlightin
 Circle watch also have various settings for customization like changing time mode, color scheme for indication, changing deep-sleep time for effective energy consumption etc.
 The watch is controlled via Bluetooth Low Energy.
 
+## Real device images
+
+![CircleWatch pic1](images/IMG_3632.jpeg)
+
 ## Instalation
 To build/load this project for ESP32 platform we need just to instal VS Code and [PlatformIO](https://platformio.org/) extension and clone the repo.
 
