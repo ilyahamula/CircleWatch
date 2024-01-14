@@ -28,7 +28,7 @@ enum class eCommand
 
 class Command
 {
-    friend class BLECommandReader;
+    friend class BluetoothUtils;
 
     Command();
     Command(const Command&) = delete;

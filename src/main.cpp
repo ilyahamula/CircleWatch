@@ -11,18 +11,6 @@
 
 namespace
 {
-    /*
-    uint8_t adjustBrightness(uint16_t light)
-    {
-        if (light <= LOW_SENSOR_VALUE)
-            return MIN_BRIGHTNESS;
-        if (light >= TOP_SENSOR_VALUE)
-            return MAX_BRIGHTNESS;
-        
-        return static_cast<uint8_t>(map(light, LOW_SENSOR_VALUE, 
-            TOP_SENSOR_VALUE, MIN_BRIGHTNESS, MAX_BRIGHTNESS));
-    }
-    */
 #ifdef DEBUG
     void printTimeInSerial(const DateTime& now)
     {
@@ -42,18 +30,13 @@ namespace
 #endif
 }
 
-//RTC_DS1307 rtc;
 RTC_DS3231 rtc;
 CircleDial* dial = nullptr;
 LightManager* light = nullptr;
 
 void setup()
 {
-    //pinMode(LIGHT_SENSOR_PIN, INPUT);
-    //pinMode(BLE_SWITCH, INPUT_PULLDOWN);
-
     dial = new CircleDial(DIAL_PIN);
-    delay(500);
 #ifdef DEBUG
     Serial.begin(9600);
     delay(1000);
@@ -63,27 +46,16 @@ void setup()
     {
         delay(200);
     }
-    //ADJUST_TIME_MACRO(rtc);
 #ifdef DEBUG
     Serial.println("RTC connected!");
 #endif
 
     light = new LightManager(LIGHT_PIN);
-    BluetoothLE::Init();
+    BluetoothUtils::Init();
 }
 
 void loop()
 {
-    /*
-    if (digitalRead(BLE_SWITCH))
-    {
-        BluetoothLE::Init();
-    }
-    else
-    {
-        BluetoothLE::Deinit();
-    }
-    */
     DeepSleepManager::inst().check(dial);
     
     DateTime now = rtc.now();
@@ -172,9 +144,7 @@ void loop()
     }
 
     dial->SetTime(now.hour(), now.minute());
-    //dial->SetBrightness(adjustBrightness(analogRead(LIGHT_SENSOR_PIN)));
     dial->Show();
-    
     light->Run();
 
 #ifdef DEBUG

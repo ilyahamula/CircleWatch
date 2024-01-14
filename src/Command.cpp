@@ -225,6 +225,8 @@ void Command::ParseCommand(const String& text)
         m_currCmd = eCommand::DialDefaultColors;
     else if (cmd == SET_DEEP_SLEEP_TIME)
         parseIntValueCmd(eCommand::TimeBeforeDeepSleep);
+    else if (cmd == DIAL_BRIGHTNESS)
+        parseIntValueCmd(eCommand::DialBrightness);
 }
 
 int Command::GetIntValue() const

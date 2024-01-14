@@ -1,13 +1,23 @@
 #pragma once
 
 #include "Defines.h"
+#include <BLEServer.h>
 
-class BLECommandReader;
-
-struct BluetoothLE
+class BluetoothUtils: 
+    public BLEServerCallbacks,
+    public BLECharacteristicCallbacks
 {
+public:
     static void Init();
-    static void Deinit();
+    BluetoothUtils();
+
+    void onConnect(BLEServer* pServer) override;
+    void onDisconnect(BLEServer* pServer) override;
+    void onWrite(BLECharacteristic* pCharacteristic) override;
+    
 private:
+    BLEServer* m_server;
+    BLEService* m_service;
+    BLECharacteristic* m_characteristic;
     static TaskHandle_t task;
 };
