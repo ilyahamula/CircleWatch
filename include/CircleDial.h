@@ -39,6 +39,7 @@ private:
 
     sRGB m_hourColor;
     sRGB m_minuteColor;
+    uint8_t m_brightness;
 
     Segment* m_segments[HOURS];
     Segment* m_currSeg;

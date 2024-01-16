@@ -17,12 +17,13 @@ CircleDial::CircleDial(uint8_t pin)
     , m_forceUpdate(false)
     , m_hourColor(FLASHMEM.ReadColor(eAddres::HoursColorAddr))
     , m_minuteColor(FLASHMEM.ReadColor(eAddres::MinutesColorAddr))
+    , m_brightness(FLASHMEM.Read(eAddres::DialBrightness))
 {
     pinMode(MOSFET_DIAL_PIN, OUTPUT);
     digitalWrite(MOSFET_DIAL_PIN, HIGH);
     
     m_strip->begin();
-    m_strip->setBrightness(DEFAULT_BRIGHTNESS);
+    SetBrightness(m_brightness == 0 ? DEFAULT_BRIGHTNESS : m_brightness);
     m_strip->show(); // Initialize all pixels to 'off'
 
     uint8_t subPixels[MAX_SUB_PIXELS_CNT];
@@ -241,7 +242,10 @@ bool CircleDial::SetTime(uint8_t hour, uint8_t min)
 
 void CircleDial::SetBrightness(uint8_t value)
 {
-    m_strip->setBrightness(value);
+    m_brightness = value;
+    m_strip->setBrightness(m_brightness);
+    m_forceUpdate = true;
+    FLASHMEM.Write(eAddres::DialBrightness, m_brightness);
 }
 
 void CircleDial::SetHoursColor(const sRGB& value)
