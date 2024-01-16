@@ -8,16 +8,14 @@
 #define SEG_THIRD_SEC 3
 #define SEG_FOURTH_SEC 4
 
-Segment::Segment(const std::initializer_list<Digit*>& list)
+Segment::Segment(Digit* first, Digit* second, Digit* third,
+        Digit* fourth, Digit* fifth)
 {
-    if (list.size() != 5)
-        throw;
-
-    int cnt = 0;
-    for (const auto& item : list)
-    {
-        m_digits[cnt++] = item;
-    }
+    m_digits[HOUR_DIGIT] = first;
+    m_digits[SEG_FIRST_SEC] = second;
+    m_digits[SEG_SECOND_SEC] = third;
+    m_digits[SEG_THIRD_SEC] = fourth;
+    m_digits[SEG_FOURTH_SEC] = fifth;
 }
 
 void Segment::Off()
