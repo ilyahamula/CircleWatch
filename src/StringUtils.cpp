@@ -14,26 +14,37 @@ namespace StringUtils
         return true;
     };
 
-    bool ParseTime(const String& text, signed char& hours, signed char& min)
+    bool ParseTime(const String& text, signed char& hours, signed char& min, signed char& sec)
     {
         const int pos = text.indexOf(TIME_SEPARATOR);
         if (pos == -1)
             return false;
 
         const String hoursStr = text.substring(0, pos);
-        const String minutesStr = text.substring(pos + 1);
+        const String minutesSecStr = text.substring(pos + 1);
+    
+        const int pos1 = minutesSecStr.indexOf(TIME_SEPARATOR);
+        if (pos1 == -1)
+            return false;
 
-        if (!isNumber(hoursStr) || !isNumber(minutesStr))
+        const String minutesStr = minutesSecStr.substring(0, pos1);
+        const String secStr = minutesSecStr.substring(pos1 + 1);
+
+        if (!isNumber(hoursStr) || !isNumber(minutesStr)
+            || !isNumber(secStr))
             return false;
         
         int hoursLocal = hoursStr.toInt();
         int minLocal = minutesStr.toInt();
+        int secLocal = secStr.toInt();
 
         if (hoursLocal > 23 || hoursLocal < 0 ||
-            minLocal > 59 || minLocal < 0)
+            minLocal > 59 || minLocal < 0 ||
+            secLocal > 59 || secLocal < 0)
             return false;
         hours = hoursLocal;
-        min = minLocal; 
+        min = minLocal;
+        sec = secLocal;
         return true;
     }
 
@@ -62,7 +73,7 @@ namespace StringUtils
         Serial.print("\nparse cmd: " );
         Serial.print(cmd);
         Serial.print("\nparse params: " );
-        Serial.print(params);
+        Serial.println(params);
         #endif
         return true;
     }
@@ -79,7 +90,7 @@ namespace StringUtils
             if (pos == -1)
             {
                 #ifdef DEBUG
-                Serial.print("\npos == -1" );
+                Serial.println("\npos == -1" );
                 #endif
                 if (!isNumber(input))
                     return false;

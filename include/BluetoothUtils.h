@@ -14,6 +14,7 @@ public:
     void onConnect(BLEServer* pServer) override;
     void onDisconnect(BLEServer* pServer) override;
     void onWrite(BLECharacteristic* pCharacteristic) override;
+    void idle();
     
 private:
     BLEServer* m_server;

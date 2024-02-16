@@ -50,6 +50,8 @@ BluetoothUtils::BluetoothUtils()
 void BluetoothUtils::onConnect(BLEServer* pServer) 
 {
     DeepSleepManager::inst().m_isUserBLEConnected = true;
+    //m_characteristic->setValue("Some text");
+    //m_characteristic->notify();
     #ifdef DEBUG
     Serial.println("BLE connected device");
     #endif
@@ -69,12 +71,16 @@ void BluetoothUtils::onWrite(BLECharacteristic* pCharacteristic)
     Command::InitOrInst().ParseCommand(value1.c_str());
 }
 
-void RunBLE(void* params)
+void BluetoothUtils::idle()
 {
-    BluetoothUtils bleObj();
-
     while(true)
         vTaskDelay(10);
+}
+
+void RunBLE(void* params)
+{
+    BluetoothUtils* bleObj = new BluetoothUtils();
+    bleObj->idle();
 }
 
 TaskHandle_t BluetoothUtils::task = nullptr;

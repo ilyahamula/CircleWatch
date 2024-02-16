@@ -148,6 +148,7 @@ void RunRainbowTask(void* params)
         while(true)
         {
             rainbow(20, *strip);
+            vTaskDelay(10);
         }
     }
 }

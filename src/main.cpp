@@ -9,9 +9,9 @@
 #include "BluetoothUtils.h"
 #include "DeepSleepManager.h"
 
+#ifdef DEBUG
 namespace
 {
-#ifdef DEBUG
     void printTimeInSerial(const DateTime& now)
     {
         Serial.print(now.year(), DEC);
@@ -27,8 +27,8 @@ namespace
         Serial.print(now.second(), DEC);
         Serial.println();
     }
-#endif
 }
+#endif
 
 RTC_DS3231 rtc;
 CircleDial* dial = nullptr;
@@ -56,8 +56,10 @@ void setup()
 
 void loop()
 {
+    #ifndef DEBUG
     DeepSleepManager::inst().check(dial);
-    
+    #endif
+
     DateTime now = rtc.now();
     const auto cmd = Command::InitOrInst().GetCommand();
 
@@ -77,8 +79,9 @@ void loop()
     {
         int8_t hours = NOT_DEFINED_TIME;
 		int8_t min = NOT_DEFINED_TIME;
-		Command::InitOrInst().GetTime(hours, min);
-        rtc.adjust(DateTime(now.year(), now.month(), now.day(), hours, min, 0));
+        int8_t sec = NOT_DEFINED_TIME;
+		Command::InitOrInst().GetTime(hours, min, sec);
+        rtc.adjust(DateTime(now.year(), now.month(), now.day(), hours, min, sec));
         break;
     }
     case eCommand::SetHourColor:
@@ -151,5 +154,4 @@ void loop()
     printTimeInSerial(now);
     delay(1000);
 #endif
-
 }

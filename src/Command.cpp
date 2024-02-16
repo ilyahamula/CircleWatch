@@ -157,7 +157,7 @@ void Command::ParseCommand(const String& text)
     // lambdas ------------------------------------------------------------
     auto parseTimeCmd = [this, &params](const eCommand cmd)
     {
-        if (!StringUtils::ParseTime(params, m_hours, m_min))
+        if (!StringUtils::ParseTime(params, m_hours, m_min, m_sec))
         {
             #ifdef DEBUG
             Serial.println("Failed to parse time!!!");
@@ -234,10 +234,11 @@ int Command::GetIntValue() const
     return m_intValue;
 }
 
-void Command::GetTime(int8_t& hours, int8_t& min) const
+void Command::GetTime(int8_t& hours, int8_t& min, int8_t& sec) const
 {
     hours = m_hours;
     min = m_min;
+    sec = m_sec;
 }
 
 const sRGB& Command::GetColor() const
