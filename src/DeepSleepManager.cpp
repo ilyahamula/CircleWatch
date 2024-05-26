@@ -1,6 +1,7 @@
 #include "DeepSleepManager.h"
 #include "Defines.h"
 #include "CircleDial.h"
+#include "RelayManager.h"
 #include <Arduino.h>
 
 namespace
@@ -54,8 +55,7 @@ void DeepSleepManager::check(CircleDial* dial)
     {
         if (dial)
             dial->TurnOff();
-        digitalWrite(MOSFET_DIAL_PIN, LOW);
-        digitalWrite(MOSFET_LIGHT_PIN, LOW);
+        RelayManager::inst().OffAll();
         esp_deep_sleep_start();
     }
 }

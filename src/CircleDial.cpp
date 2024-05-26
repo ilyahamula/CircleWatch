@@ -2,7 +2,7 @@
 #include "Digit.h"
 #include "Segment.h"
 #include "FlashMemory.h"
-
+#include "RelayManager.h"
 #include <Adafruit_NeoPixel.h>
 #define MAX_SUB_PIXELS_CNT 4
 
@@ -19,8 +19,7 @@ CircleDial::CircleDial(uint8_t pin)
     , m_minuteColor(FLASHMEM.ReadColor(eAddres::MinutesColorAddr))
     , m_brightness(FLASHMEM.Read(eAddres::DialBrightness))
 {
-    pinMode(MOSFET_DIAL_PIN, OUTPUT);
-    digitalWrite(MOSFET_DIAL_PIN, HIGH);
+    RelayManager::inst().OnDial();
     
     m_strip->begin();
     SetBrightness(m_brightness == 0 ? DEFAULT_BRIGHTNESS : m_brightness);
