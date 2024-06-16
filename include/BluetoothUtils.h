@@ -8,8 +8,8 @@ class BluetoothUtils:
     public BLECharacteristicCallbacks
 {
 public:
-    static void Init();
-    BluetoothUtils();
+    static void Init(const char* watchSettings);
+    BluetoothUtils(const char* watchSettings);
 
     void onConnect(BLEServer* pServer) override;
     void onDisconnect(BLEServer* pServer) override;
@@ -20,5 +20,6 @@ private:
     BLEServer* m_server;
     BLEService* m_service;
     BLECharacteristic* m_characteristic;
+
     static TaskHandle_t task;
 };

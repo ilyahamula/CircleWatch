@@ -13,7 +13,7 @@ CircleDial::CircleDial(uint8_t pin)
     , m_currSeg(nullptr)
     , m_currHour(NOT_DEFINED_TIME)
     , m_currMin(NOT_DEFINED_TIME)
-    , m_mode(static_cast<eDialMode>(FLASHMEM.Read(eAddres::ModeAddr)))
+    , m_mode(static_cast<eDialMode>(FLASHMEM.Read(eAddres::DialMode)))
     , m_forceUpdate(false)
     , m_hourColor(FLASHMEM.ReadColor(eAddres::HoursColorAddr))
     , m_minuteColor(FLASHMEM.ReadColor(eAddres::MinutesColorAddr))
@@ -265,7 +265,7 @@ void CircleDial::SetMode(eDialMode mode)
 {
     m_mode = mode;
     m_forceUpdate = true;
-    FLASHMEM.Write(eAddres::ModeAddr, static_cast<uint8_t>(m_mode));
+    FLASHMEM.Write(eAddres::DialMode, static_cast<uint8_t>(m_mode));
 }
 
 void CircleDial::Show()

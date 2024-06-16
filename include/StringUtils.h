@@ -1,6 +1,6 @@
 #pragma once
+#include <Arduino.h>
 
-class String;
 class sRGB;
 
 namespace  StringUtils
@@ -11,4 +11,5 @@ namespace  StringUtils
         ,signed char& sec);
     bool ParseColor(const String& text, sRGB& color);
     bool ParseCmdAndParams(const String& text, String& cmd, String& params);
+    String ColorToString(const sRGB& color);
 }

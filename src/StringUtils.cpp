@@ -2,8 +2,6 @@
 #include "Defines.h"
 #include "sRGB.h"
 
-#include <Arduino.h>
-
 namespace StringUtils
 {
     bool isNumber(const String& str)
@@ -120,5 +118,12 @@ namespace StringUtils
             return false;
 
         return true;
+    }
+
+    String ColorToString(const sRGB& color)
+    {
+        return String(color.red) + ","
+            + String(color.green) + ","
+            + String(color.blue);
     }
 }

@@ -2,6 +2,7 @@
 #include "Defines.h"
 #include "CircleDial.h"
 #include "RelayManager.h"
+#include "FlashMemory.h"
 #include <Arduino.h>
 
 namespace
@@ -21,7 +22,7 @@ namespace
 DeepSleepManager::DeepSleepManager()
     : m_isUserBLEConnected(false)
     , m_isLighthOn(false)
-    , m_activeTime(WORKING_TIME)
+    , m_activeTime(FLASHMEM.ReadDSTime())
 {
     pinMode(WAKEUP_PIN, INPUT_PULLUP);
     attachInterrupt(WAKEUP_PIN, &ISR, RISING);
