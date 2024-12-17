@@ -20,7 +20,7 @@ class FlashMemory
     FlashMemory(const FlashMemory&) = delete;
     FlashMemory& operator=(const FlashMemory&) = delete;
 public:
-    static FlashMemory& Instance();
+    static FlashMemory& inst();
 
     void Write(eAddres addres, unsigned char value) const;
     void WriteColor(eAddres addres, const sRGB& color) const;
@@ -30,4 +30,4 @@ public:
     unsigned long ReadDSTime() const;
 };
 
-#define FLASHMEM FlashMemory::Instance()
+#define FLASHMEM FlashMemory::inst()

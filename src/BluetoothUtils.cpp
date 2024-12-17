@@ -70,7 +70,7 @@ void BluetoothUtils::onDisconnect(BLEServer* pServer)
 void BluetoothUtils::onWrite(BLECharacteristic* pCharacteristic)
 {
     std::string value1 = pCharacteristic->getValue();
-    Command::InitOrInst().ParseCommand(value1.c_str());
+    Command::inst().ParseCommand(value1.c_str());
 }
 
 void BluetoothUtils::idle()

@@ -9,7 +9,7 @@ FlashMemory::FlashMemory()
     EEPROM.begin(static_cast<size_t>(eAddres::Size));
 }
 
-FlashMemory& FlashMemory::Instance()
+FlashMemory& FlashMemory::inst()
 {
     static FlashMemory inst;
     return inst;

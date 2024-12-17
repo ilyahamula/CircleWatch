@@ -1,4 +1,4 @@
-#include "LightManager.h"
+#include "Light.h"
 #include "Command.h"
 #include "DeepSleepManager.h"
 #include "RelayManager.h"
@@ -154,13 +154,13 @@ void RunRainbowTask(void* params)
     }
 }
 
-void LightManager::Test(uint8_t pin, uint16_t ledNum)
+void Light::Test(uint8_t pin, uint16_t ledNum)
 {
     static Adafruit_NeoPixel* strip = createStrip(pin, ledNum);
     runRainbowWheel(*strip);
 }
 
-LightManager::LightManager(uint8_t pin)
+Light::Light(uint8_t pin)
     : m_strip(createStrip(pin, LIGHT_LED_COUNT))
     , m_outerColor(255, 255, 255)
     , m_innerColor(255, 255, 255)
@@ -174,12 +174,7 @@ LightManager::LightManager(uint8_t pin)
     RelayManager::inst().OffLight();
 }
 
-LightManager::~LightManager()
-{
-    delete m_strip;
-}
-
-void LightManager::SetBrightness(uint8_t value)
+void Light::SetBrightness(uint8_t value)
 {
     if (m_mode == eLightMode::RainbowWheel || m_mode == eLightMode::Off)
         return;
@@ -187,28 +182,28 @@ void LightManager::SetBrightness(uint8_t value)
     m_strip->setBrightness(value);
 }
 
-void LightManager::SetOuterColor(const sRGB& color)
+void Light::SetOuterColor(const sRGB& color)
 {
     m_outerColor = color;
 }
 
-void LightManager::SetInnerColor(const sRGB& color)
+void Light::SetInnerColor(const sRGB& color)
 {
     m_innerColor = color;
 }
 
-void LightManager::SetMode(const eLightMode mode)
+void Light::SetMode(const eLightMode mode)
 {
     m_mode = mode;
     SetUpdate(true);
 }
 
-void LightManager::SetUpdate(const bool update)
+void Light::SetUpdate(const bool update)
 {
     m_update = update;
 }
 
-void LightManager::Run()
+void Light::Run()
 {
     if (!m_update)
         return;
@@ -265,7 +260,7 @@ void LightManager::Run()
     DeepSleepManager::inst().m_isLighthOn = m_mode != eLightMode::Off;
 }
 
-void LightManager::RunNormalMode()
+void Light::RunNormalMode()
 {
     for(uint16_t i = 0; i <= LIGHT_OUTER_END_IDX; i++)
     {
@@ -278,12 +273,12 @@ void LightManager::RunNormalMode()
     m_strip->show();
 }
 
-void LightManager::RunSmoothTransfusionMode()
+void Light::RunSmoothTransfusionMode()
 {
 
 }
 
-void LightManager::RunRainbowWheelMode()
+void Light::RunRainbowWheelMode()
 {
     xTaskCreatePinnedToCore(
         RunRainbowTask,   /* Task function. */
@@ -295,14 +290,14 @@ void LightManager::RunRainbowWheelMode()
         tskNO_AFFINITY);          /* pin task to core 0 */ 
 }
 
-void LightManager::Off()
+void Light::Off()
 {
     m_strip->clear();
     m_strip->show();
     RelayManager::inst().OffLight();
 }
 
-void LightManager::KillTaskIfExist()
+void Light::KillTaskIfExist()
 {
     if (m_lightTask)
     {
@@ -312,7 +307,7 @@ void LightManager::KillTaskIfExist()
     }
 }
 
-void LightManager::TurnOff()
+void Light::TurnOff()
 {
     KillTaskIfExist();
     Off();

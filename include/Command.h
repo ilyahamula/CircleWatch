@@ -38,7 +38,7 @@ public:
 #ifdef DEBUG
     static String CmdToString(eCommand cmd);
 #endif
-    static Command& InitOrInst();
+    static Command& inst();
     void SetCommand(eCommand cmd);
     const eCommand GetCommand();
     int GetIntValue() const;
@@ -49,9 +49,7 @@ private:
     void ParseCommand(const String& text);
 
 private:
-    //TaskHandle_t m_taskHndl;
     mutable SemaphoreHandle_t m_semaphore;
-    eCommand m_currCmd;
 
 private:
     int8_t m_hours;
@@ -59,4 +57,6 @@ private:
     int8_t m_sec;
     sRGB m_color;
     int m_intValue;
+
+    eCommand m_currCmd;
 };

@@ -3,6 +3,8 @@
 class RelayManager
 {
     RelayManager();
+    RelayManager(const RelayManager&) = delete;
+    RelayManager& operator=(const RelayManager&) = delete;
 public:
     static RelayManager& inst();
 
