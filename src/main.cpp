@@ -4,10 +4,12 @@
 #include "RTClib.h"
 
 #include "CircleDial.h"
-#include "LightManager.h"
+#include "Light.h"
 #include "Command.h"
 #include "BluetoothUtils.h"
 #include "DeepSleepManager.h"
+#include "FlashMemory.h"
+#include "StringUtils.h"
 
 namespace
 {
@@ -28,11 +30,21 @@ namespace
         Serial.println();
     }
 #endif
+
+    String GetAllSettings(uint8_t hour, uint8_t min, uint8_t sec)
+    {
+        return String(hour) + "," + String(min) + "," + String(sec) + "," +
+            String(FLASHMEM.Read(eAddres::DialMode)) + "," +
+            String(FLASHMEM.Read(eAddres::DialBrightness)) + "," +
+            StringUtils::ColorToString(FLASHMEM.ReadColor(eAddres::HoursColorAddr)) + "," +
+            StringUtils::ColorToString(FLASHMEM.ReadColor(eAddres::MinutesColorAddr)) + "," +
+            String(FLASHMEM.ReadDSTime());
+    }
 }
 
 RTC_DS3231 rtc;
 CircleDial* dial = nullptr;
-LightManager* light = nullptr;
+Light* light = nullptr;
 
 void setup()
 {
@@ -50,16 +62,20 @@ void setup()
     Serial.println("RTC connected!");
 #endif
 
-    light = new LightManager(LIGHT_PIN);
-    BluetoothUtils::Init();
+    light = new Light(LIGHT_PIN);
+
+    DateTime now = rtc.now();
+    BluetoothUtils::Init(GetAllSettings(now.hour(), now.minute(), now.second()).c_str());
 }
 
 void loop()
 {
+    #ifndef DEBUG
     DeepSleepManager::inst().check(dial);
-    
+    #endif
+
     DateTime now = rtc.now();
-    const auto cmd = Command::InitOrInst().GetCommand();
+    const auto cmd = Command::inst().GetCommand();
 
 #ifdef DEBUG
     Serial.println(Command::CmdToString(cmd));
@@ -77,15 +93,16 @@ void loop()
     {
         int8_t hours = NOT_DEFINED_TIME;
 		int8_t min = NOT_DEFINED_TIME;
-		Command::InitOrInst().GetTime(hours, min);
-        rtc.adjust(DateTime(now.year(), now.month(), now.day(), hours, min, 0));
+        int8_t sec = NOT_DEFINED_TIME;
+		Command::inst().GetTime(hours, min, sec);
+        rtc.adjust(DateTime(now.year(), now.month(), now.day(), hours, min, sec));
         break;
     }
     case eCommand::SetHourColor:
-        dial->SetHoursColor(Command::InitOrInst().GetColor());
+        dial->SetHoursColor(Command::inst().GetColor());
         break;
     case eCommand::SetMinColor:
-        dial->SetMinutesColor(Command::InitOrInst().GetColor());
+        dial->SetMinutesColor(Command::inst().GetColor());
         break;
     case eCommand::LightOff:
         light->SetMode(eLightMode::Off);
@@ -101,7 +118,7 @@ void loop()
         break;
     case eCommand::LightCustom:
     {
-        const auto& color = Command::InitOrInst().GetColor();
+        const auto& color = Command::inst().GetColor();
         light->SetInnerColor(color);
         light->SetOuterColor(color);
         light->SetMode(eLightMode::Custom);
@@ -110,7 +127,7 @@ void loop()
     case eCommand::LightBrightness:
     {
         light->SetUpdate(true);
-        light->SetBrightness(Command::InitOrInst().GetIntValue());
+        light->SetBrightness(Command::inst().GetIntValue());
         break;
     }
     case eCommand::LightSmoothe:
@@ -130,12 +147,12 @@ void loop()
     }
     case eCommand::TimeBeforeDeepSleep:
     {
-        DeepSleepManager::inst().m_activeTime = Command::InitOrInst().GetIntValue();
+        DeepSleepManager::inst().m_activeTime = Command::inst().GetIntValue();
         break;
     }
     case eCommand::DialBrightness:
     {
-        dial->SetBrightness(static_cast<uint8_t>(Command::InitOrInst().GetIntValue()));
+        dial->SetBrightness(static_cast<uint8_t>(Command::inst().GetIntValue()));
         break;
     }
     case eCommand::None:
@@ -151,5 +168,4 @@ void loop()
     printTimeInSerial(now);
     delay(1000);
 #endif
-
 }

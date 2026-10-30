@@ -2,7 +2,7 @@
 #include "Digit.h"
 #include "Segment.h"
 #include "FlashMemory.h"
-
+#include "RelayManager.h"
 #include <Adafruit_NeoPixel.h>
 #define MAX_SUB_PIXELS_CNT 4
 
@@ -13,14 +13,13 @@ CircleDial::CircleDial(uint8_t pin)
     , m_currSeg(nullptr)
     , m_currHour(NOT_DEFINED_TIME)
     , m_currMin(NOT_DEFINED_TIME)
-    , m_mode(static_cast<eDialMode>(FLASHMEM.Read(eAddres::ModeAddr)))
+    , m_mode(static_cast<eDialMode>(FLASHMEM.Read(eAddres::DialMode)))
     , m_forceUpdate(false)
     , m_hourColor(FLASHMEM.ReadColor(eAddres::HoursColorAddr))
     , m_minuteColor(FLASHMEM.ReadColor(eAddres::MinutesColorAddr))
     , m_brightness(FLASHMEM.Read(eAddres::DialBrightness))
 {
-    pinMode(MOSFET_DIAL_PIN, OUTPUT);
-    digitalWrite(MOSFET_DIAL_PIN, HIGH);
+    RelayManager::inst().OnDial();
     
     m_strip->begin();
     SetBrightness(m_brightness == 0 ? DEFAULT_BRIGHTNESS : m_brightness);
@@ -266,7 +265,7 @@ void CircleDial::SetMode(eDialMode mode)
 {
     m_mode = mode;
     m_forceUpdate = true;
-    FLASHMEM.Write(eAddres::ModeAddr, static_cast<uint8_t>(m_mode));
+    FLASHMEM.Write(eAddres::DialMode, static_cast<uint8_t>(m_mode));
 }
 
 void CircleDial::Show()

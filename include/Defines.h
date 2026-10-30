@@ -71,8 +71,11 @@
 // deep sleep
 #define WAKEUP_PIN D1
 #define WORKING_TIME 100000 // 1 min
-#define MOSFET_DIAL_PIN D7
-#define MOSFET_LIGHT_PIN D8
+#define RELAY_DIAL_PIN D6
+#define RELAY_LIGHT_PIN D7
+#define RELAY_OUTPUT_MODE OUTPUT_OPEN_DRAIN
+#define RELAY_ON LOW
+#define RELAY_OFF HIGH
 
 #define BLE_SWITCH D6
 

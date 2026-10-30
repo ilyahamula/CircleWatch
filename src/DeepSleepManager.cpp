@@ -1,6 +1,8 @@
 #include "DeepSleepManager.h"
 #include "Defines.h"
 #include "CircleDial.h"
+#include "RelayManager.h"
+#include "FlashMemory.h"
 #include <Arduino.h>
 
 namespace
@@ -20,7 +22,7 @@ namespace
 DeepSleepManager::DeepSleepManager()
     : m_isUserBLEConnected(false)
     , m_isLighthOn(false)
-    , m_activeTime(WORKING_TIME)
+    , m_activeTime(FLASHMEM.ReadDSTime())
 {
     pinMode(WAKEUP_PIN, INPUT_PULLUP);
     attachInterrupt(WAKEUP_PIN, &ISR, RISING);
@@ -54,8 +56,7 @@ void DeepSleepManager::check(CircleDial* dial)
     {
         if (dial)
             dial->TurnOff();
-        digitalWrite(MOSFET_DIAL_PIN, LOW);
-        digitalWrite(MOSFET_LIGHT_PIN, LOW);
+        RelayManager::inst().OffAll();
         esp_deep_sleep_start();
     }
 }

@@ -15,13 +15,12 @@ enum class eLightMode
     Off,
 };
 
-class LightManager
+class Light
 {
 public:
-    LightManager(uint8_t pin);
-    LightManager(const LightManager&) = delete;
-    LightManager& operator=(const LightManager&) = delete;
-    ~LightManager();
+    Light(uint8_t pin);
+    Light(const Light&) = delete;
+    Light& operator=(const Light&) = delete;
 
 public:
     static void Test(uint8_t pin = DIAL_PIN, uint16_t ledNum = DIAL_LED_COUNT);

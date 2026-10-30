@@ -1,5 +1,5 @@
 #include "Command.h"
-#include "LightManager.h"
+#include "Light.h"
 #include "StringUtils.h"
 
 #include <Arduino.h>
@@ -39,14 +39,14 @@ void RunCommandTracker(void* parametrs)
             if (!digitalRead(HOUR_BTN_PIN) && !digitalRead(MIN_BTN_PIN))
             {
                 if (++twoBtnClickCounter == 1)
-                    LightManager::Instance().SetMode(eLightMode::Normal);
+                    Light::inst().SetMode(eLightMode::Normal);
                 else if (twoBtnClickCounter == 2)
-                    LightManager::Instance().SetMode(eLightMode::SmoothTransfusion);
+                    Light::inst().SetMode(eLightMode::SmoothTransfusion);
                 else if (twoBtnClickCounter == 3)
-                    LightManager::Instance().SetMode(eLightMode::RainbowWheel);
+                    Light::inst().SetMode(eLightMode::RainbowWheel);
                 else if (twoBtnClickCounter == 4)
                 {
-                    LightManager::Instance().SetMode(eLightMode::Off);
+                    Light::inst().SetMode(eLightMode::Off);
                     twoBtnClickCounter = 0;
                 }
             }
@@ -56,7 +56,7 @@ void RunCommandTracker(void* parametrs)
         {
             delay(SHORT_PRESS_TIME);
             if (digitalRead(HOUR_BTN_PIN) && digitalRead(MIN_BTN_PIN))
-                Command::InitOrInst().SetCommand(eCommand::AddHour);
+                Command::inst().SetCommand(eCommand::AddHour);
             else
                 needRelese = true;
         }
@@ -64,7 +64,7 @@ void RunCommandTracker(void* parametrs)
         {
             delay(SHORT_PRESS_TIME);
             if (digitalRead(MIN_BTN_PIN) && digitalRead(HOUR_BTN_PIN))
-                Command::InitOrInst().SetCommand(eCommand::AddMin);
+                Command::inst().SetCommand(eCommand::AddMin);
             else
                 needRelese = true;
         }
@@ -80,7 +80,7 @@ Command::Command()
 {
 }
 
-Command& Command::InitOrInst()
+Command& Command::inst()
 {
     static Command inst;
     return inst;
@@ -157,7 +157,7 @@ void Command::ParseCommand(const String& text)
     // lambdas ------------------------------------------------------------
     auto parseTimeCmd = [this, &params](const eCommand cmd)
     {
-        if (!StringUtils::ParseTime(params, m_hours, m_min))
+        if (!StringUtils::ParseTime(params, m_hours, m_min, m_sec))
         {
             #ifdef DEBUG
             Serial.println("Failed to parse time!!!");
@@ -192,7 +192,6 @@ void Command::ParseCommand(const String& text)
     
     if (cmd == SET_TIME)
         parseTimeCmd(eCommand::SetTime);
-
     else if (cmd == RESTART)
         ESP.restart();
     else if (cmd == ADD_HOUR)
@@ -234,10 +233,11 @@ int Command::GetIntValue() const
     return m_intValue;
 }
 
-void Command::GetTime(int8_t& hours, int8_t& min) const
+void Command::GetTime(int8_t& hours, int8_t& min, int8_t& sec) const
 {
     hours = m_hours;
     min = m_min;
+    sec = m_sec;
 }
 
 const sRGB& Command::GetColor() const

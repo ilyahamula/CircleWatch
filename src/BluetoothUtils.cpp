@@ -1,21 +1,22 @@
 #include "BluetoothUtils.h"
 #include "Defines.h"
+#include "Command.h"
+#include "DeepSleepManager.h"
+#include "FlashMemory.h"
 
 #include <Arduino.h>
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLEUtils.h>
 #include <BLE2902.h>
-
-#include "Command.h"
-#include "DeepSleepManager.h"
-
+/*
 #define DEVINFO_UUID              (uint16_t)0x180a
 #define DEVINFO_MANUFACTURER_UUID (uint16_t)0x2a29
 #define DEVINFO_NAME_UUID         (uint16_t)0x2a24
 #define DEVINFO_SERIAL_UUID       (uint16_t)0x2a25
+*/
 
-BluetoothUtils::BluetoothUtils()
+BluetoothUtils::BluetoothUtils(const char* watchSettings)
 {
     String devName = DEVICE_NAME;
     String chipId = String((uint32_t)(ESP.getEfuseMac() >> 24), HEX);
@@ -31,6 +32,8 @@ BluetoothUtils::BluetoothUtils()
         BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE);
 
     m_characteristic->setCallbacks(this);
+    m_characteristic->setValue(std::string(watchSettings));
+
     m_service->start();
 
     // ----- Advertising
@@ -58,6 +61,7 @@ void BluetoothUtils::onConnect(BLEServer* pServer)
 void BluetoothUtils::onDisconnect(BLEServer* pServer)
 {
     DeepSleepManager::inst().m_isUserBLEConnected = false;
+    pServer->startAdvertising();
     #ifdef DEBUG
     Serial.println("Device BLE disconnected");
     #endif
@@ -66,30 +70,35 @@ void BluetoothUtils::onDisconnect(BLEServer* pServer)
 void BluetoothUtils::onWrite(BLECharacteristic* pCharacteristic)
 {
     std::string value1 = pCharacteristic->getValue();
-    Command::InitOrInst().ParseCommand(value1.c_str());
+    Command::inst().ParseCommand(value1.c_str());
 }
 
-void RunBLE(void* params)
+void BluetoothUtils::idle()
 {
-    BluetoothUtils bleObj();
-
     while(true)
         vTaskDelay(10);
 }
 
+void RunBLE(void* params)
+{
+    auto obj = new BluetoothUtils(((String*)params)->c_str());
+    obj->idle();
+}
+
 TaskHandle_t BluetoothUtils::task = nullptr;
 
-void BluetoothUtils::Init()
+void BluetoothUtils::Init(const char* watchSettings)
 {
     #ifdef DEBUG
     Serial.println("BLE initialized");
     #endif
+
     xTaskCreatePinnedToCore(
-        RunBLE,   
-        "command tracker",     
-        10000,       
-        NULL,        
-        tskIDLE_PRIORITY,   
-        &task,      
+        RunBLE,
+        "command tracker",
+        10000,
+        new String(watchSettings),
+        tskIDLE_PRIORITY,
+        &task,
         tskNO_AFFINITY);
 }
