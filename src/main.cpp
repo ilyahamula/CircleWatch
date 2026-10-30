@@ -92,9 +92,9 @@ void loop()
     case eCommand::SetTime:
     {
         int8_t hours = NOT_DEFINED_TIME;
-		int8_t min = NOT_DEFINED_TIME;
+		    int8_t min = NOT_DEFINED_TIME;
         int8_t sec = NOT_DEFINED_TIME;
-		Command::inst().GetTime(hours, min, sec);
+		    Command::inst().GetTime(hours, min, sec);
         rtc.adjust(DateTime(now.year(), now.month(), now.day(), hours, min, sec));
         break;
     }
