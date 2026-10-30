@@ -1,0 +1,175 @@
+CIRCLEWATCH BLE COMMAND REFERENCE
+=================================
+
+TRANSPORT
+---------
+BLE device name      : CircleWatch_<chipId>   (chipId = hex of the ESP32 MAC part)
+Service UUID         : 8a1b5b74-15a8-44f2-9175-01fd0c08702d
+Characteristic UUID  : 42e2c66a-bff1-409e-9b99-1c7c5ad05970   (READ | WRITE)
+
+WRITE : send a command as a plain UTF-8 string to the characteristic.
+READ  : returns the settings string (see "SETTINGS STRING" below).
+
+COMMAND FORMAT
+--------------
+    <command>[ <params>]
+
+- Command name starts with "/" and is case-sensitive.
+- Command and params are separated by ONE space (' ').
+- Everything after the first space is the params string.
+- Commands without params are sent as just the name (no trailing space).
+
+PARAM TYPES
+-----------
+INT    Unsigned decimal integer, digits only (no sign, no spaces, no decimals).
+       Example: 120
+COLOR  Three INT values "R,G,B" separated by commas, no spaces. Each 0-255.
+       Example: 255,128,0
+TIME   "H:M:S" with colon separators, all three parts required.
+       H = 0-23, M = 0-59, S = 0-59.   Example: 14:05:30
+
+Invalid params: SET_TIME / COLOR commands with unparsable params are still
+executed with the previous stored value (or garbage if none), so always
+validate in the app before sending. INT commands with invalid params are
+ignored.
+
+-------------------------------------------------------------------------------
+TIME COMMANDS
+-------------------------------------------------------------------------------
+
+/set_time <TIME>
+    Set the clock time (date is kept).
+    Example: /set_time 14:05:30
+
+/add_hour
+    Move the clock forward by 1 hour.
+    Example: /add_hour
+
+/sub_hour
+    Move the clock back by 1 hour.
+    Example: /sub_hour
+
+-------------------------------------------------------------------------------
+DIAL COMMANDS (clock face)
+-------------------------------------------------------------------------------
+
+/set_hour_color <COLOR>
+    Set the color of the hours. Saved to flash.
+    Example: /set_hour_color 255,255,255
+
+/set_min_color <COLOR>
+    Set the color of the minutes. Saved to flash.
+    Example: /set_min_color 0,0,255
+
+/dial_default_colors
+    Reset hours color to 255,255,255 and minutes color to 0,0,255.
+    Example: /dial_default_colors
+
+/dial_digit_hour
+    Dial mode: hour shown as a digit.
+    Example: /dial_digit_hour
+
+/dial_segment_hour
+    Dial mode: hour shown as a segment.
+    Example: /dial_segment_hour
+
+/dial_brightness <INT>
+    Set dial brightness. Saved to flash.
+    Range in firmware: 0-255 (value is cast to uint8_t; recommended
+    10-180, default 50).
+    Example: /dial_brightness 80
+
+-------------------------------------------------------------------------------
+LIGHT COMMANDS (ambient light)
+-------------------------------------------------------------------------------
+
+/light_off
+    Turn the light off.
+    Example: /light_off
+
+/light_rainbow_mode
+    Rainbow wheel animation.
+    Example: /light_rainbow_mode
+
+/light_white_cold_mode
+    Cold white light.
+    Example: /light_white_cold_mode
+
+/light_white_warm_mode
+    Warm white light.
+    Example: /light_white_warm_mode
+
+/light_custom_mode <COLOR>
+    Solid custom color on both the inner and outer light.
+    Example: /light_custom_mode 255,0,128
+
+/light_brightness <INT>
+    Set light brightness.
+    Range in firmware: 0-255 (recommended 10-180, default 50).
+    Ignored while the light is Off or in Rainbow mode.
+    Example: /light_brightness 120
+
+/light_smoothe_mode        [DEPRECATED]
+    Smooth color transfusion. Do not use in new app versions.
+    Example: /light_smoothe_mode
+
+-------------------------------------------------------------------------------
+SYSTEM COMMANDS
+-------------------------------------------------------------------------------
+
+/set_deep_sleep_time <INT>
+    Time in MILLISECONDS the watch stays awake (with no BLE client
+    connected, light off) before going to deep sleep.
+    Example: /set_deep_sleep_time 60000     (1 minute)
+
+/restart
+    Reboot the ESP32. BLE connection will drop.
+    Example: /restart
+
+-------------------------------------------------------------------------------
+SETTINGS STRING (READ)
+-------------------------------------------------------------------------------
+Read from the characteristic. Value is captured when the device boots, so it
+reflects the state at startup, not live changes.
+
+Format: 12 comma-separated numbers:
+
+    H,M,S,DIAL_MODE,DIAL_BRIGHTNESS,HR,HG,HB,MR,MG,MB,DEEP_SLEEP_TIME
+
+Layout (index : meaning):
+    0  : hour (0-23)
+    1  : minute (0-59)
+    2  : second (0-59)
+    3  : dial mode (0 = digit hour, 1 = segment hour)
+    4  : dial brightness
+    5  : hours color R
+    6  : hours color G
+    7  : hours color B
+    8  : minutes color R
+    9  : minutes color G
+    10 : minutes color B
+    11 : deep sleep time (ms)
+
+Example: 14,5,30,0,50,255,255,255,0,0,255,60000
+
+-------------------------------------------------------------------------------
+QUICK LIST
+-------------------------------------------------------------------------------
+/set_time <H:M:S>
+/add_hour
+/sub_hour
+/set_hour_color <R,G,B>
+/set_min_color <R,G,B>
+/dial_default_colors
+/dial_digit_hour
+/dial_segment_hour
+/dial_brightness <0-255>
+/light_off
+/light_rainbow_mode
+/light_white_cold_mode
+/light_white_warm_mode
+/light_custom_mode <R,G,B>
+/light_brightness <0-255>
+/light_smoothe_mode (deprecated)
+/set_deep_sleep_time <ms>
+/restart
